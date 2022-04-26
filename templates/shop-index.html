@@ -71,7 +71,7 @@ p {
                       <a href="#product-pop-up" class="btn btn-default fancybox-fast-view">View</a>
                     </div>
                   </div>
-                  <h3><a href="shop-item.html">{{product.name}}</a></h3>
+                  <h3><a href="detail/{{product.slug}}">{{product.name}}</a></h3>
                   {% if product.discounted_price > 0 %}
                   <div class="pi-price">${{ product.discounted_price }}</div>
                   {% else %}
@@ -97,7 +97,7 @@ p {
             <ul classcategories ="list-group margin-bottom-25 sidebar-menu">
               {% for cat in categories %}
               <li class="list-group-item clearfix dropdown">
-                <a href="shop-product-list.html">
+                <a href="category/{{cat.slug}}">
                   <i class="fa fa-angle-right"></i>
                   {{cat.name}}
                   

@@ -2,19 +2,36 @@
 {% load static %}
 {% block content %}
 
+
+    <div class="title-wrapper">
+      <div class="container"><div class="container-inner">
+        <h1><span>MEN</span> CATEGORY</h1>
+        <em>Over 4000 Items are available here</em>
+      </div></div>
+    </div>
+
     <div class="main">
       <div class="container">
         <ul class="breadcrumb">
             <li><a href="index.html">Home</a></li>
             <li><a href="">Store</a></li>
-            <li class="active">Search result</li>
+            <li class="active">Men category</li>
         </ul>
         <!-- BEGIN SIDEBAR & CONTENT -->
         <div class="row margin-bottom-40">
           <!-- BEGIN SIDEBAR -->
           <div class="sidebar col-md-3 col-sm-5">
+            <ul class="list-group margin-bottom-25 sidebar-menu">
+              {% for subcat in subcategories %}
+              <li class="list-group-item clearfix"><a href="/subcategory/{{subcat.slug}}"><i class="fa fa-angle-right"></i> {{subcat.name}}</a></li>
+              {% endfor %}
+
+
+         
+            </ul>
+
             <div class="sidebar-filter margin-bottom-25">
-              <h2>Search categories</h2>
+              <h2>Filter</h2>
               <h3>Availability</h3>
               <div class="checkbox-list">
                 <label><input type="checkbox"> Not Available (3)</label>
@@ -51,23 +68,6 @@
           <!-- END SIDEBAR -->
           <!-- BEGIN CONTENT -->
           <div class="col-md-9 col-sm-7">
-            <div class="content-search margin-bottom-20">
-              <div class="row">
-                <div class="col-md-6">
-                  <h1>Search result for <em>shoes</em></h1>
-                </div>
-                <div class="col-md-6">
-                  <form action="#">
-                    <div class="input-group">
-                      <input type="text" placeholder="Search again" class="form-control">
-                      <span class="input-group-btn">
-                        <button class="btn btn-primary" type="submit">Search</button>
-                      </span>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
             <div class="row list-view-sorting clearfix">
               <div class="col-md-2 col-sm-2 list-view">
                 <a href="javascript:;"><i class="fa fa-th-large"></i></a>
@@ -101,9 +101,10 @@
               </div>
             </div>
             <!-- BEGIN PRODUCT LIST -->
+            
             <div class="row product-list">
-              
-              {% for products in search_product %}
+              <!-- PRODUCT ITEM START -->
+             {% for products in subcategory_products %}
               <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="product-item">
                   <div class="pi-img-wrapper">
@@ -127,7 +128,6 @@
               {% endfor %}
               <!-- PRODUCT ITEM END -->
             </div>
-            
             <!-- END PRODUCT LIST -->
             <!-- BEGIN PAGINATOR -->
             <div class="row">
