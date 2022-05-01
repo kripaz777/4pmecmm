@@ -8,7 +8,7 @@
         <ul class="breadcrumb">
             <li><a href="index.html">Home</a></li>
             <li><a href="">Store</a></li>
-            <li class="active">Standart forms</li>
+            <li class="active">Login</li>
         </ul>
         <!-- BEGIN SIDEBAR & CONTENT -->
         <div class="row margin-bottom-40">
@@ -29,7 +29,7 @@
 
           <!-- BEGIN CONTENT -->
           <div class="col-md-9 col-sm-7">
-            <h1>Signup</h1>
+            <h1>Login</h1>
             <div class="content-form-page">
               <form method = "POST" role="form" class="form-horizontal form-without-legend">
                 {% csrf_token %}
@@ -39,27 +39,17 @@
                 <div class="form-group">
                   <label class="col-lg-2 control-label" for="first-name">Username <span class="require">*</span></label>
                   <div class="col-lg-8">
-                    <input name = "username" type="text" id="first-name" class="form-control">
+                    {{form.username}}
                   </div>
                 </div>
-                <div class="form-group">
-                  <label class="col-lg-2 control-label" for="last-name">Email <span class="require">*</span></label>
-                  <div class="col-lg-8">
-                    <input name = "email" type="text" id="first-name" class="form-control">
-                  </div>
-                </div>
+                
                 <div class="form-group">
                   <label class="col-lg-2 control-label" for="email">Password <span class="require">*</span></label>
                   <div class="col-lg-8">
-                    <input name = "password" type="password" id="email" class="form-control">
+                    {{form.password}}
                   </div>
                 </div>
-                <div class="form-group">
-                  <label class="col-lg-2 control-label" for="telephone">Confirm Password <span class="require">*</span></label>
-                  <div class="col-lg-8">
-                    <input name = "cpassword" type="password" id="telephone" class="form-control">
-                  </div>
-                </div>
+                
                 
                 <div class="row">
                   <div class="col-lg-8 col-md-offset-2 padding-left-0 padding-top-20">

@@ -393,23 +393,32 @@ Purchase Premium Metronic Admin Theme: http://themeforest.net/item/metronic-resp
                 <li><a href="shop-terms-conditions-page.html">Terms &amp; Conditions</a></li>
               </ul>
             </li>
-            
-            
-            <li><a href="http://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemes&amp;utm_source=download&amp;utm_medium=banner&amp;utm_campaign=metronic_frontend_freebie" target="_blank">Admin theme</a></li>
+            {% if user.is_authenticated %}
+            <li><a href = "">{{user.username}}</a></li>
+            <li><a href = "/account/logout/">Logout</a></li>
+            {% else %}
+            <li><a href = "/account/login/">Login</a></li>
+            <li><a href = "signup">Signup</a></li>
+            {% endif %}
 
             <!-- BEGIN TOP SEARCH -->
             <li class="menu-search">
               <span class="sep"></span>
               <i class="fa fa-search search-btn"></i>
               <div class="search-box">
-                <form action="#">
+
+
+                <form action="/search" method = "GET">
                   <div class="input-group">
-                    <input type="text" placeholder="Search" class="form-control">
+                    <input type="text" name = "query" placeholder="Search" class="form-control">
                     <span class="input-group-btn">
                       <button class="btn btn-primary" type="submit">Search</button>
                     </span>
                   </div>
                 </form>
+
+
+
               </div> 
             </li>
             <!-- END TOP SEARCH -->
