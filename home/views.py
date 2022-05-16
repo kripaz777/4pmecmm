@@ -85,6 +85,7 @@ def signup(request):
 					password = password
 					)
 				user.save()
+				User.objects.filter(username = username).update(is_active = False)
 
 				code = OTP.objects.create(
 					user = username,
@@ -100,7 +101,7 @@ def signup(request):
 				    )
 				email.send()
 				messages.error(request,'The otp is sent to your email.')
-				return redirect('/verify')
+				return redirect('verify')
 		else:
 			messages.error(request,'The password does not match')
 			return render(request,'shop-standart-forms.html')
@@ -113,22 +114,40 @@ def Verification_code(request):
 		username = request.POST['username']
 		if OTP.objects.filter(token = code,user=username).exists():
 			User.objects.filter(username = username).update(is_active = True)
+			return redirect('verify')
 	return render(request,'code.html')
 
 
-
+from django.contrib.auth.decorators import login_required
+@login_required
 def cart(request,slug):
 	if Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).exists():
 		quantity = Cart.objects.get(slug = slug,user=request.user.username,checkout = False).quantity
+		price = Product.objects.get(slug = slug).price
+		discounted_price = Product.objects.get(slug = slug).discounted_price
 		quantity = quantity +1
-		Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).update(quantity = quantity)
+		if discounted_price >0:
+			original_price = discounted_price
+			total = original_price*quantity
+		else:
+			total = price*quantity
+
+		
+		Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).update(quantity = quantity,total = total)
 
 	else:
 		username = request.user.username
+		price = Product.objects.get(slug = slug).price
+		discounted_price = Product.objects.get(slug = slug).discounted_price
+		if discounted_price >0:
+			original_price = discounted_price
+		else:
+			original_price = price
 		data = Cart.objects.create(
 			user = username,
 			slug = slug,
-			items = Product.objects.filter(slug = slug)[0]
+			items = Product.objects.filter(slug = slug)[0],
+			total = original_price
 			)
 		data.save()
 
