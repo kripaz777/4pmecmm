@@ -2,6 +2,8 @@ from django.shortcuts import render,redirect
 from .models import *
 # Create your views here.
 from django.views.generic import View
+from django.core.mail import EmailMessage
+
 
 class BaseView(View):
 	views = {}
@@ -58,6 +60,7 @@ class SearchView(BaseView):
 
 from django.contrib import messages
 from django.contrib.auth.models import User
+import random
 def signup(request):
 	if request.method == "POST":
 		username = request.POST['username']
@@ -66,6 +69,8 @@ def signup(request):
 		cpassword = request.POST['cpassword']
 
 		if password == cpassword:
+			randomlist = random.sample(range(1000, 9999), 1)
+
 			if User.objects.filter(username = username).exists():
 				messages.error(request,'The username is already taken')
 				return redirect('/signup')
@@ -80,12 +85,35 @@ def signup(request):
 					password = password
 					)
 				user.save()
+
+				code = OTP.objects.create(
+					user = username,
+					token = randomlist[0]
+					)
+				code.save()
+
+				email = EmailMessage(
+				    'Email verification code',
+				    f'Please enter email verification code {randomlist[0]}',
+				    '<your email add>',
+				    [email]
+				    )
+				email.send()
+				messages.error(request,'The otp is sent to your email.')
+				return redirect('/verify')
 		else:
 			messages.error(request,'The password does not match')
 			return render(request,'shop-standart-forms.html')
-
-
 	return render(request,'shop-standart-forms.html')
+
+def Verification_code(request):
+	
+	if request.method == 'POST':
+		code = request.POST['code']
+		username = request.POST['username']
+		if OTP.objects.filter(token = code,user=username).exists():
+			User.objects.filter(username = username).update(is_active = True)
+	return render(request,'code.html')
 
 
 
@@ -93,7 +121,7 @@ def cart(request,slug):
 	if Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).exists():
 		quantity = Cart.objects.get(slug = slug,user=request.user.username,checkout = False).quantity
 		quantity = quantity +1
-		Cart.objects.get(slug = slug,user=request.user.username,checkout = False).update(quantity = quantity)
+		Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).update(quantity = quantity)
 
 	else:
 		username = request.user.username
@@ -104,25 +132,85 @@ def cart(request,slug):
 			)
 		data.save()
 
-		return redirect('/')
+	return redirect('/mycart')
 
 
-	def deletecart(request,slug):
-		if Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).exists():
-			Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).delete()
+def deletecart(request,slug):
+	if Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).exists():
+		Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).delete()
 
-		return redirect('/')
+	return redirect('/mycart')
 
-	def decreasecart(request,slug):
-		if Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).exists():
-			quantity = Cart.objects.get(slug = slug,user=request.user.username,checkout = False).quantity
-			if quantity >1:
-				quantity = quantity -1
-				Cart.objects.get(slug = slug,user=request.user.username,checkout = False).update(quantity = quantity)
-		return redirect('/')
+def decreasecart(request,slug):
+	if Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).exists():
+		quantity = Cart.objects.get(slug = slug,user=request.user.username,checkout = False).quantity
+		if quantity >1:
+			quantity = quantity -1
+			Cart.objects.filter(slug = slug,user=request.user.username,checkout = False).update(quantity = quantity)
+	return redirect('/mycart')
 
 
 class CartView(BaseView):
 	def get(self,request):
 		self.views['cart_product'] = Cart.objects.filter(user=request.user.username,checkout = False)
 		return render(request,'shop-shopping-cart.html',self.views)
+
+
+
+# ------------------------------------------------API-----------------------------------------------------------------------
+from rest_framework import serializers, viewsets
+from .serializers import *
+from rest_framework import generics
+
+from django_filters.rest_framework import  DjangoFilterBackend
+from rest_framework.filters import OrderingFilter,SearchFilter
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+
+class ProductFilterViewSet(generics.ListAPIView):
+	queryset = Product.objects.all()
+	serializer_class = ProductSerializer
+	filter_backends = [DjangoFilterBackend,OrderingFilter,SearchFilter]
+	filter_fields = ['id','name','price','labels','category','subcategory']
+	ordering_fields = ['price','id','name']
+	search_fields = ['name','description']
+
+
+from rest_framework import status
+# from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import *
+from rest_framework.views import APIView
+# from snippets.serializers import SnippetSerializer
+class ProductCRUDViewSet(APIView):
+	def get_object(self,pk):
+		try:
+			return Product.objects.get(pk = pk)
+		except:
+			print("The id is not in db")
+
+	def get(self,request,pk,format = None):
+		product = self.get_object(pk)
+		serializer = ProductSerializer(product)
+		return Response(serializer.data)
+
+	def post(self,request,pk):
+		serializer = ProductSerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	def put(self,request,pk):
+		serializer = ProductSerializer(product, data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	def delete(self,request,pk):
+		product.delete()
+		return Response(status=status.HTTP_204_NO_CONTENT)

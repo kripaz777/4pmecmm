@@ -77,7 +77,7 @@ p {
                   {% else %}
                   <div class="pi-price">${{ product.price }}</div>
                   {% endif %}
-                  <a href="javascript:;" class="btn btn-default add2cart">Add to cart</a>
+                  <a href="/cart/{{product.slug}}" class="btn btn-default add2cart">Add to cart</a>
                   <div class="sticker sticker-sale"></div>
                 </div>
               </div>
@@ -135,7 +135,7 @@ p {
           <!-- END SIDEBAR -->
           <!-- BEGIN CONTENT -->
           <div class="col-md-9 col-sm-8">
-            <h2>Three items</h2>
+            <h2>Hot Items</h2>
             <div class="owl-carousel owl-carousel3">
               {% for hot in hot_products %}
               <div>
@@ -154,7 +154,7 @@ p {
                   <div class="pi-price">${{hot.price}}</div>
 
                   {% endif %}
-                  <a href="javascript:;" class="btn btn-default add2cart">Add to cart</a>
+                  <a href="/cart/{{hot.slug}}" class="btn btn-default add2cart">Add to cart</a>
                   <div class="sticker sticker-new"></div>
                 </div>
               </div>

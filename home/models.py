@@ -74,3 +74,11 @@ class Cart(models.Model):
 
 	def __str__(self):
 		return self.user
+
+
+class OTP(models.Model):
+	user = models.CharField(max_length = 400)
+	token = models.CharField(max_length = 20)
+
+	def __str__(self):
+		return self.user
